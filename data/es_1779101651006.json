@@ -1,0 +1,83 @@
+{
+  "id": "es_1779101651006",
+  "timestamp": "2026-05-18T10:54:20.480Z",
+  "paper": {
+    "title": "L’infrastructure du lien social : un déterminant territorial du vote pour le Rassemblement National (1995-2022) sous la direction d’Hugo Subtil (student project)",
+    "authors": "Yann Crapsky, Yann Mear, Sacha Ratsavong, Tristan Touchard",
+    "link": "https://drive.google.com/file/d/1m5-4Qb_DkoiMs7cZvqpL_w6JGJCDMUjE/view?usp=sharing",
+    "published": "no",
+    "figure_number": "Figure 7 (page 22), Main result",
+    "takeaway": "The loss of third places is driving up the National Rally’s share of the vote in rural French municipalities",
+    "description": "For each rural (suburban(right) and non suburban (left)) municipality in France, we count the total number of third-place (non-exhaustive list) present in the municipality in 1998 and identify the year during which the total number of these facilities fell below 60% of the 1998 level in order to define the beginning of treatment. The treatment is therefore binary and staggered, with all municipalities being untreated at the start of the observation period. A municipality that becomes treated remains so until the end of the study period. We then assess the effect of treatment 1, 2, ..., 5 elections after the beginning of the treatment on the RN’s share of the vote in the first round of the presidential election following the treatment (for the elections from 2002 to 2022). \n\nNote: the results given below are only for non-suburban rural municipalities."
+  },
+  "treatment": {
+    "type": "binary",
+    "changes": "one_increase",
+    "values_at_period1": "one"
+  },
+  "methodology": {
+    "code_language": "python",
+    "code": "import pandas as pd\nimport polars as pl\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom did_multiplegt_dyn import DidMultiplegtDyn  \nimport re\nimport pyarrow\n\n\"\"\" \nImporting two dataframes\n\n- df_non_suburban contains, for all rural, non suburbans french municipalities (for the 1995 to 2022 presidential elections) : socioeconomic variables, \nelectoral outcomes of the RN on first round of the presidential elections and total number of third places \n\n- - df_suburban : same as df_non_suburban but for rural suburbans municipalities\n\n\"\"\"\n\ndf_non_suburban = pd.read_csv(r\"C:\\Users\\yancr\\Documents\\ENSAE_V2\\STATAPP\\V2\\STATAPP_V2\\Données\\Partie Econometrie\\communes_social_rnp.csv\", index_col=0)\ndf_non_suburban['codecommune'] = df_non_suburban['codecommune'].astype(str).str.zfill(5)\ndf_non_suburban['Annee'] = pd.to_numeric(df_non_suburban['Annee'], errors='coerce')\n\n# Ensuite, tu peux appliquer ton filtre\n\ndf_suburban = pd.read_csv(r\"C:\\Users\\yancr\\Documents\\ENSAE_V2\\STATAPP\\V2\\STATAPP_V2\\Données\\Partie Econometrie\\communes_social_rp.csv\", index_col=0)\ndf_suburban['codecommune'] = df_suburban['codecommune'].astype(str).str.zfill(5)\ndf_suburban['Annee'] = pd.to_numeric(df_suburban['Annee'], errors='coerce')\n\n# Defining the treatment\n\ndef treatment(df):\n    # 1. Defining tretment condition\n    df_1998 = df[df['Annee'] == 1998].copy()\n    df_1998['seuil'] = df_1998['total_equipements'] * 0.6\n\n    mapping_seuil = df_1998.set_index('codecommune')['seuil']\n    df['seuil'] = df['codecommune'].map(mapping_seuil)\n\n    # 2. Applying the tretment condition\n    df['traitée'] = (df['total_equipements'] < df['seuil']).astype(int)\n    \n    df = df.sort_values(by=['codecommune', 'Annee'])\n\n    # 3 municipalities keep the treatment until the end of the observation period\n    df['traitée'] = df.groupby('codecommune')['traitée'].cummax()\n    \n    annees_elections = [1995, 2002, 2007, 2012, 2017, 2022]\n    mapping_periodes = {annee: i for i, annee in enumerate(annees_elections)}\n    \n    # 4. Assigning tretment period\n    df['periode_actuelle'] = df['Annee'].map(mapping_periodes)\n    \n    # 5. Indentifying first year of treatment\n    premier_traitement_annee = df[df['traitée'] == 1].groupby('codecommune')['Annee'].min()\n    \n    premiere_periode_traitement = premier_traitement_annee.map(mapping_periodes)\n    \n    df['periode_debut'] = df['codecommune'].map(premiere_periode_traitement)\n    \n    # 6. Defining \"Time to treatment\"\n    df['time_to_treatment'] = df['periode_actuelle'] - df['periode_debut']\n    \n    df = df.drop(columns=['periode_actuelle', 'periode_debut'])\n\n    return df\n\n# Applying the treatment\n\ndf_non_suburban = treatment(df_non_suburban)\ndf_suburban = treatment(df_suburban)\n\n# Appliyng the method\n\ndef DID (df) :\n\n    # CORRECTION : Création de df_pres à partir de l'argument df\n    df_pres = df.copy()\n\n    # Selecting election years\n    annees_pres = [1995, 2002, 2007, 2012, 2017, 2022]\n    df_pres = df_pres[df_pres['Annee'].isin(annees_pres)]\n\n    # Filtering Na\n    df_pres = df_pres.dropna(subset=['vote_RN_pres', 'traitée'])\n\n    # Forcing format to avoid potential errors\n\n    df_pres['vote_RN_pres'] = df_pres['vote_RN_pres'].astype('float64')\n    df_pres['traitée'] = df_pres['traitée'].astype('float64')\n    df_pres['Annee'] = df_pres['Annee'].astype('int64')\n\n    # Convertion in Polars\n    df_pres_polars = pl.from_pandas(df_pres)\n\n    # 5. Estimation Staggered DiD (avec le nom de classe corrigé)\n    modele_did = DidMultiplegtDyn(\n        df=df_pres_polars,         \n        outcome='vote_RN_pres',    \n        group='codecommune',       \n        time='Annee',              \n        treatment='traitée',       \n        placebo=2,                \n        effects=5,                 \n        cluster='codecommune', \n        controls = ['pop', 'propf', 'prop014', 'prop1539', 'prop60p', 'petranger', 'pouem', 'pchom', 'paind','pbac', 'psup', 'revmoy']\n    )\n\n    modele_did.fit()\n    modele_did.summary()\n    modele_did.plot()\n    \n    return df_pres, modele_did.result\n\n\n# Recovering the results\n\ndef extract_model_summary(did_results, nom_du_groupe):\n    \"\"\"\n    Extrait les coefficients (mat_res_XX) du dictionnaire de résultats,\n    les nettoie, et ajoute une colonne pour identifier le modèle.\n    \"\"\"\n    # 1. On récupère le tableau directement depuis le dictionnaire\n    res_df = did_results['mat_res_XX'].copy()\n    \n    # 2. On renomme pour que ce soit propre\n    summary_table = res_df.rename(columns={\n        'Time': 'time_to_treatment',\n        'Estimate': 'coefficient_did',\n        'SE': 'standard_error_did',\n        'LB CI': 'ci_lower',  # Toujours utile pour tracer les intervalles de confiance !\n        'UB CI': 'ci_upper'\n    })\n    \n    # 3. On ne garde que l'essentiel\n    summary_table = summary_table[['time_to_treatment', 'coefficient_did', 'standard_error_did', 'ci_lower', 'ci_upper']].copy()\n    \n    # 4. On ajoute la colonne qui différencie tes deux modèles\n    summary_table['type_commune'] = nom_du_groupe\n    \n    return summary_table\n\n# Applying the extraction\n\ndf_non_sub_clean, resultats_non_sub = DID(df_non_suburban)\ndf_sub_clean, resultats_sub = DID(df_suburban)\n\n\nresume_non_sub = extract_model_summary(resultats_non_sub, \"Non Suburban\")\nresume_sub = extract_model_summary(resultats_sub, \"Suburban\")\n\ndf_coefficients_finaux = pd.concat([resume_non_sub, resume_sub], ignore_index=True)\n\ndf_coefficients_finaux = df_coefficients_finaux.sort_values(by=['type_commune', 'time_to_treatment'])\n\nprint(df_coefficients_finaux)\n\n# Export\ndf_coefficients_finaux.to_csv(\"resultats_did_complets.csv\", index=False)",
+    "switchers_effect1": "4754",
+    "n_effect1": "37217"
+  },
+  "results": {
+    "confidence_level": 95,
+    "observations": 7,
+    "data": [
+      {
+        "period": -2,
+        "estimate": -0.0008685527970344153,
+        "std_error": 0.0013605265762711082,
+        "lb": -0.0035351848865257875,
+        "ub": 0.0017980792924569568
+      },
+      {
+        "period": -1,
+        "estimate": 0.00034947352292809345,
+        "std_error": 0.0008021602437869352,
+        "lb": -0.0012227605548942994,
+        "ub": 0.0019217076007504864
+      },
+      {
+        "period": 1,
+        "estimate": 0.0008515835757531778,
+        "std_error": 0.0007096719383228772,
+        "lb": -0.0005393734233596616,
+        "ub": 0.002242540574866017
+      },
+      {
+        "period": 2,
+        "estimate": 0.004087991920035716,
+        "std_error": 0.0009425947390586213,
+        "lb": 0.002240506231480818,
+        "ub": 0.0059354776085906134
+      },
+      {
+        "period": 3,
+        "estimate": 0.00796928431900767,
+        "std_error": 0.0012617558146181354,
+        "lb": 0.005496242922356124,
+        "ub": 0.010442325715659215
+      },
+      {
+        "period": 4,
+        "estimate": 0.012173098767229022,
+        "std_error": 0.0017005299494889786,
+        "lb": 0.008840060066230624,
+        "ub": 0.01550613746822742
+      },
+      {
+        "period": 5,
+        "estimate": 0.014658075574266249,
+        "std_error": 0.002515714846580639,
+        "lb": 0.009727274474968196,
+        "ub": 0.0195888766735643
+      }
+    ]
+  },
+  "decision": {
+    "accepted": true,
+    "accepted_at": "2026-05-18T10:54:20.480Z"
+  }
+}
