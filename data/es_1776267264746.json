@@ -8,7 +8,7 @@
     "published": "yes",
     "figure_number": "7",
     "takeaway": "The establishment of a horse-post relay in a parish is associated with a subsequent increase in rebellion",
-    "description": "Figure 7 displays period-specific average treatment effects of opening a horse-post relay on rebellions in pre-Revolutionary France. The treatment is binary, staggered, and non-absorbing. The unit of observation is the parish-decade. The dataset is a panel of 35,287 parishes from the 1710s to the 1780s, combining an original GIS of horse-post relay openings and closures with a database of rebellions in Ancien Régime France. Identification stems from comparing changes in rebellion across parishes as relays open or close at different times. Figure 7 shows no meaningful pre-trends, which supports the parallel-trends assumption. After treatment, rebellion rises with a lag: effects appear in the second decade after relay establishment and grow thereafter. We interpret this pattern as evidence that deeper state penetration generated backlash among local populations through the material consequences of state centralization."
+    "description": "The study examines whether opening horse-post relays increased rebellion in pre-Revolutionary France. Treatment is binary, staggered, and non-absorbing, while the outcome is rebellion at the parish-decade level; the authors exploit variation in relay openings and closures using a staggered first switch difference-in-differences design. The figure shows no meaningful pre-trends and a delayed increase in rebellion beginning around two decades after a relay opens."
   },
   "treatment": {
     "type": "binary",

@@ -8,7 +8,7 @@
     "published": "yes",
     "figure_number": "8",
     "takeaway": "The effect of cross-border shopping unavalibility on sales of hard liquor in Norway",
-    "description": "Treatment is travel quarantines that make the driving time to a foreign alcohol store more than 90 minutes. This treatment is binary and turns on and off for the treated stores during the COVID-19 pandemic. Data is from Vinmonopolet, the Norwegian government-owned retail monopoly for alcoholic beverages. The dataset contains 209 weekly observations over the period 2019 to 2022 for sales of wine and hard liquor in each of the 344 stores of Vinmonopolet, in total 71,896 observations. 62 weeks prior to the initial treatment is used for pre-trends."
+    "description": "Travel quarantines created a temporary binary treatment when driving to a foreign alcohol store took over 90 minutes. Using weekly sales data from 344 Norwegian Vinmonopolet stores between 2019 and 2022, the study examines wine and liquor sales, with 62 pre-treatment weeks used to assess trends."
   },
   "treatment": {
     "type": "binary",
@@ -17,7 +17,7 @@
   },
   "methodology": {
     "code_language": "stata",
-    "code": "//Data statement: \n//The main data used in this paper is owned by Vinmonopolet and not \n//publicly available on the detailed level used in this study. \n//For questions about access to the data, please contact Vinmonopolet AS.\n//Some data sources are publicly available, see references in the paper.\n\nset maxvar 120000\nquery memory\n\n//Outcome: liter - treated 90 minutes \n\n//Hard liquor: Estimations for Figure 8 and Table 2\nuse \"stat_HL_90.dta\", clear \n\n//With covariates\n\n//Due to running time issues, we seperated the simulations in two \n//i) for the 62 placebos (pre-treatment)\n//ii) for the 146 effects (post-treatment)\n\n//i) 62 effects + 62 placebos to get all pre-period estimates\nscalar t1 = c(current_time)\ndid_multiplegt_dyn ln_sales_liter storeID iso_year_week_num AD_turned, effects(62) placebo(62) cluster(storeID) controls(cases_per_inhabitant duty_free_access_NY unempl_share_w region_nearest_SWE ombud_nearest)\nscalar t2 = c(current_time)\ndisplay (clock(t2, \"hms\") - clock(t1, \"hms\")) / 1000 \" seconds\"\n\n//ii) 146 effects + 1 placebo to get all post-period estimates\nscalar t1 = c(current_time)\ndid_multiplegt_dyn ln_sales_liter storeID iso_year_week_num AD_turned, effects(146) placebo(1) cluster(storeID) controls(cases_per_inhabitant duty_free_access_NY unempl_share_w region_nearest_SWE ombud_nearest)\nscalar t2 = c(current_time)\ndisplay (clock(t2, \"hms\") - clock(t1, \"hms\")) / 1000 \" seconds\"",
+    "code": "did_multiplegt_dyn ln_sales_liter storeID iso_year_week_num AD_turned, effects(146) placebo(62) cluster(storeID) controls(cases_per_inhabitant duty_free_access_NY unempl_share_w region_nearest_SWE ombud_nearest)\nscalar t2 = c(current_time)\ndisplay (clock(t2, \"hms\") - clock(t1, \"hms\")) / 1000 \" seconds\"",
     "switchers_effect1": "37",
     "n_effect1": "332"
   },
