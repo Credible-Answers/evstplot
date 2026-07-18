@@ -8,7 +8,7 @@
     "published": "yes",
     "figure_number": "7",
     "takeaway": "The establishment of a horse-post relay in a parish is associated with a subsequent increase in rebellion",
-    "description": "The study examines whether opening horse-post relays increased rebellion in pre-Revolutionary France. Treatment is binary, staggered, and non-absorbing, while the outcome is rebellion at the parish-decade level; the authors exploit variation in relay openings and closures using a staggered first switch difference-in-differences design. The figure shows no meaningful pre-trends and a delayed increase in rebellion beginning around two decades after a relay opens."
+    "description": "The graph examines whether opening horse-post relays increased rebellion in pre-Revolutionary France. The treatment, which is binary and non-absorbing, is whether a parish in pre-Revolutionary France has a horse-post relay. The outcome is a measure of rebellion at the parish-decade level."
   },
   "treatment": {
     "type": "binary",
@@ -17,7 +17,7 @@
   },
   "methodology": {
     "code_language": "stata",
-    "code": "did_multiplegt_dyn rebellions id_geofla decade post, effects(7) placebo(3) cluster(id_geofla) graph_off\n\nIMPORTANT NOTE: our figure highlights the relevant pre and post periods based on the number of switchers used in the identification at each period. Hence while we show 7 post and 3 pre periods, the relevant periods that we rely on for interpretation are 3 post and 2 pre periods. Check the published graph for more details. The generated graph below is somewhat a mis-characterization.",
+    "code": "did_multiplegt_dyn rebellions id_geofla decade post, effects(7) placebo(3) cluster(id_geofla) graph_off",
     "switchers_effect1": "1099",
     "n_effect1": "244586"
   },

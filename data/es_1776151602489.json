@@ -8,7 +8,7 @@
     "published": "",
     "figure_number": "Figure 4",
     "takeaway": "Newspaper entry increases voter turnout in US counties",
-    "description": "The treatment is the number of daily newspapers in a US county. Uses difference-in-differences with staggered and on-and-off treatment adoption. Data covers US counties from 1868 to 2004. Results show newspaper entry increases presidential voter turnout. Pre-trends are not significant."
+    "description": "The graph examines whether newspapers increase voters' turnout in US presidential elections from 1868 to 1928. The treatment, which is non-binary and non-absorbing, is the number of daily newspapers in a US county*presidential election year. The outcome is voter turnout."
   },
   "treatment": {
     "type": "discrete",
