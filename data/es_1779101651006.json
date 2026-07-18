@@ -2,13 +2,13 @@
   "id": "es_1779101651006",
   "timestamp": "2026-05-18T10:54:20.480Z",
   "paper": {
-    "title": "L’infrastructure du lien social : un déterminant territorial du vote pour le Rassemblement National (1995-2022) sous la direction d’Hugo Subtil (student project)",
+    "title": "The Infrastructure of Social Ties: A Territorial Determinant of Voting for the National Rally (1995–2022).",
     "authors": "Yann Crapsky, Yann Mear, Sacha Ratsavong, Tristan Touchard",
     "link": "https://drive.google.com/file/d/1m5-4Qb_DkoiMs7cZvqpL_w6JGJCDMUjE/view?usp=sharing",
     "published": "no",
     "figure_number": "Figure 7 (page 22), Main result",
     "takeaway": "The loss of third places is driving up the National Rally’s share of the vote in rural French municipalities",
-    "description": "The study defines treatment for rural French municipalities as the year when the number of third places falls below 60% of its 1998 level. Treatment is binary, staggered over time, and permanent once it begins. The analysis estimates the effect of treatment 1–5 elections later on the National Rally (RN) vote share in the first round of presidential elections (2002–2022). The results shown refer only to non-suburban rural municipalities."
+    "description": "Ray Oldenburg (1989) defines third places as the spaces of everyday life that are neither the home nor the workplace and that provide a setting for informal social interaction (such as cafés, bars, and neighborhood shops). The graph examines whether the disappearance of third places increases votes for the far right in French non suburban rural municipalities. A municipality is defined as treated after the first year when the number of third places falls below 60% of its 1998 level. By construction, the treatment is binary and absorbing. The outcome is the National Rally (RN) vote share in the first round of presidential elections from 2002 to 2022."
   },
   "treatment": {
     "type": "binary",

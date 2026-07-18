@@ -8,7 +8,7 @@
     "published": "yes",
     "figure_number": "8",
     "takeaway": "The effect of cross-border shopping unavalibility on sales of hard liquor in Norway",
-    "description": "Travel quarantines created a temporary binary treatment when driving to a foreign alcohol store took over 90 minutes. Using weekly sales data from 344 Norwegian Vinmonopolet stores between 2019 and 2022, the study examines wine and liquor sales, with 62 pre-treatment weeks used to assess trends."
+    "description": "Norway has high taxes on wine and liquor, and cross-border purchases are frequent. The graph examines whether Covid travel quarantines increased domestic wine and liquor sales. The treatment, which is binary and non-absorbing, is whether a domestic liquor store has a foreign competitor within 90 minutes of driving or less. The outcome is weekly sales of Norwegian liquor stores."
   },
   "treatment": {
     "type": "binary",
